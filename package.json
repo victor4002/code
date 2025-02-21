@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "16": "^0.0.2",
+    "@react-native-mapbox-gl/maps": "^8.5.0",
+    "expo": "^52.0.33",
+    "metro": "^0.81.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/react": "~18.3.12"
+  }
+}
