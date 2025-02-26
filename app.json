@@ -1,0 +1,21 @@
+{
+  "name": "main",
+  "displayName": "Your App Display Name",
+  "extra": {
+    "eas": {
+      "projectId": "c29c79ec-844d-43ef-a7d8-6bcb8c5d14c0"
+    }
+  },
+  "expo": {
+    "android": {
+      "package": "com.kriseze.main"
+    },
+    "ios": {
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    }
+  }
+}
