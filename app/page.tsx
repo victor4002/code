@@ -1,65 +1,463 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion, useInView, useSpring, useTransform } from "framer-motion";
+import {
+  ArrowRight,
+  Sparkles,
+  Zap,
+  Crown,
+  Star,
+  ChevronRight,
+  Download,
+  Shield,
+  Clock,
+  TrendingUp,
+  Package,
+  Heart,
+  Eye,
+} from "lucide-react";
+import { allProducts, categories } from "@/lib/products";
+import { useCartStore } from "@/lib/stores/cart-store";
+import { useCurrencyStore } from "@/lib/stores/currency-store";
+import { useUIStore } from "@/lib/stores/ui-store";
+import { useRipple, RippleButton } from "@/hooks/use-ripple";
+import { ProductCard } from "@/components/shop/product-card";
+
+// Hero Product Gallery - A selection of featured products
+const heroProducts = allProducts.slice(0, 4);
+
+// Counter Animation Component
+function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const spring = useSpring(0, { duration: 2000 });
+  const display = useTransform(spring, (current) =>
+    Math.floor(current).toLocaleString()
+  );
+
+  useEffect(() => {
+    if (isInView) {
+      spring.set(value);
+    }
+  }, [isInView, spring, value]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <span ref={ref}>
+      <motion.span>{display}</motion.span>
+      {suffix}
+    </span>
+  );
+}
+
+// Luxury Badge Component
+function LuxuryBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--color-accent-primary)]/10 text-[var(--color-accent-primary)] text-xs font-bold uppercase tracking-wider rounded-full">
+      <Crown className="w-3 h-3" />
+      {children}
+    </span>
+  );
+}
+
+export default function HomePage() {
+  const { addItem } = useCartStore();
+  const { formatPrice } = useCurrencyStore();
+  const { addToast } = useUIStore();
+  const { createRipple } = useRipple();
+
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+
+  // Filter products by category
+  const filteredProducts = useMemo(() => {
+    if (activeCategory === "All") return allProducts;
+    return allProducts.filter((p) => p.category?.name === activeCategory);
+  }, [activeCategory]);
+
+  // Best sellers
+  const bestsellers = allProducts.filter((p) => p.tags?.includes("bestseller"));
+
+  // Auto-rotate hero
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveHeroIndex((prev) => (prev + 1) % heroProducts.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleAddToCart = useCallback(
+    (product: (typeof allProducts)[0]) => (e: React.MouseEvent<HTMLElement>) => {
+      createRipple(e);
+      addItem(product);
+      addToast({
+        title: "Added to cart",
+        description: `${product.name} has been added to your cart.`,
+        type: "success",
+      });
+    },
+    [addItem, addToast, createRipple]
+  );
+
+  return (
+    <main className="min-h-screen overflow-x-hidden">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-[var(--color-bg-primary)]">
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `linear-gradient(var(--color-text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--color-text-primary) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
+          
+          {/* Gradient Orbs */}
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[var(--color-accent-primary)]/5 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[var(--color-accent-secondary)]/5 rounded-full blur-[100px]" />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        <div className="container-luxury relative z-10 pt-32 pb-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <LuxuryBadge>Premium Digital Products</LuxuryBadge>
+
+              <h1 className="mt-6 text-5xl md:text-6xl lg:text-7xl font-bold text-[var(--color-text-primary)] leading-[1.1]">
+                Discover
+                <span className="block text-[var(--color-accent-primary)]">
+                  Excellence
+                </span>
+              </h1>
+
+              <p className="mt-6 text-lg md:text-xl text-[var(--color-text-secondary)] max-w-lg leading-relaxed">
+                Curated digital products for creators who demand the extraordinary.
+                Templates, eBooks, and tools crafted with precision.
+              </p>
+
+              {/* Stats */}
+              <div className="flex flex-wrap gap-8 mt-10">
+                {[
+                  { value: 500, suffix: "+", label: "Products" },
+                  { value: 50000, suffix: "+", label: "Customers" },
+                  { value: 99, suffix: "%", label: "Satisfaction" },
+                ].map((stat, i) => (
+                  <div key={i}>
+                    <div className="text-3xl font-bold text-[var(--color-text-primary)]">
+                      <Counter value={stat.value} suffix={stat.suffix} />
+                    </div>
+                    <div className="text-sm text-[var(--color-text-muted)] mt-1">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap gap-4 mt-10">
+                <Link href="#products">
+                  <RippleButton className="px-8 py-4 bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] font-semibold rounded-2xl hover:bg-[var(--color-accent-hover)] transition-all flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    Explore Products
+                  </RippleButton>
+                </Link>
+                <Link href="#categories">
+                  <button className="px-8 py-4 border-2 border-[var(--color-border)] text-[var(--color-text-primary)] font-semibold rounded-2xl hover:border-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] transition-all flex items-center gap-2">
+                    <Package className="w-5 h-5" />
+                    Browse Categories
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Hero Product Gallery */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="relative aspect-square max-w-lg mx-auto">
+                {/* Main Product Display */}
+                {heroProducts.map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    initial={false}
+                    animate={{
+                      opacity: activeHeroIndex === index ? 1 : 0,
+                      scale: activeHeroIndex === index ? 1 : 0.95,
+                      zIndex: activeHeroIndex === index ? 10 : 0,
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute inset-0"
+                  >
+                    <Link href={`/products/${product.slug}`}>
+                      <div className="relative w-full h-full rounded-3xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
+                        <Image
+                          src={product.image_url || "/images/placeholder.svg"}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                          priority={index === 0}
+                        />
+                        {/* Overlay Info */}
+                        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[var(--color-bg-primary)] via-[var(--color-bg-primary)]/80 to-transparent">
+                          <p className="text-[var(--color-accent-primary)] text-sm font-bold uppercase tracking-wider mb-1">
+                            {product.category?.name}
+                          </p>
+                          <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
+                            {product.name}
+                          </h3>
+                          <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                            {formatPrice(product.price)}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+
+                {/* Navigation Dots */}
+                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex gap-2">
+                  {heroProducts.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveHeroIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        activeHeroIndex === index
+                          ? "w-8 bg-[var(--color-accent-primary)]"
+                          : "bg-[var(--color-border)] hover:bg-[var(--color-text-muted)]"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <div className="w-6 h-10 border-2 border-[var(--color-border)] rounded-full flex justify-center pt-2">
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-1.5 h-1.5 bg-[var(--color-text-muted)] rounded-full"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Categories Section */}
+      <section id="categories" className="py-24 border-t border-[var(--color-border)]">
+        <div className="container-luxury">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <LuxuryBadge>Categories</LuxuryBadge>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-[var(--color-text-primary)]">
+              Browse by Category
+            </h2>
+            <p className="mt-4 text-lg text-[var(--color-text-secondary)]">
+              Explore our curated collection of premium digital products
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {categories.map((category, index) => (
+              <motion.div
+                key={category}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Link
+                  href={`/?category=${encodeURIComponent(category)}`}
+                  className="group block p-6 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-2xl hover:border-[var(--color-accent-primary)]/50 hover:bg-[var(--color-accent-primary)]/5 transition-all"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] flex items-center justify-center mb-4 group-hover:bg-[var(--color-accent-primary)] group-hover:text-[var(--color-bg-primary)] transition-all">
+                    <Package className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-semibold text-[var(--color-text-primary)]">
+                    {category}
+                  </h3>
+                  <p className="text-sm text-[var(--color-text-muted)] mt-1">
+                    {
+                      allProducts.filter((p) => p.category?.name === category).length
+                    }{" "}
+                    products
+                  </p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Bestsellers Section */}
+      <section className="py-24 border-t border-[var(--color-border)]">
+        <div className="container-luxury">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+            <div>
+              <LuxuryBadge>Most Popular</LuxuryBadge>
+              <h2 className="mt-4 text-4xl font-bold text-[var(--color-text-primary)]">
+                Bestsellers
+              </h2>
+              <p className="mt-2 text-lg text-[var(--color-text-secondary)]">
+                Our most loved products by customers worldwide
+              </p>
+            </div>
+            <Link
+              href="/?category=All"
+              className="text-[var(--color-accent-primary)] hover:text-[var(--color-accent-hover)] transition-colors flex items-center gap-2 font-medium"
+            >
+              View All Products
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid-responsive">
+            {bestsellers.slice(0, 4).map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Products Grid Section */}
+      <section id="products" className="py-24 border-t border-[var(--color-border)]">
+        <div className="container-luxury">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+            <div>
+              <LuxuryBadge>All Products</LuxuryBadge>
+              <h2 className="mt-4 text-4xl font-bold text-[var(--color-text-primary)]">
+                Browse Collection
+              </h2>
+              <p className="mt-2 text-lg text-[var(--color-text-secondary)]">
+                Discover our complete collection of premium digital products
+              </p>
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+              {["All", ...categories].map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                    activeCategory === category
+                      ? "bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)]"
+                      : "bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)]"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <motion.div layout className="grid-responsive">
+            {filteredProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-20">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] flex items-center justify-center">
+                <Package className="w-10 h-10 text-[var(--color-text-muted)]" />
+              </div>
+              <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
+                No products found
+              </h3>
+              <p className="text-[var(--color-text-secondary)]">
+                Try selecting a different category
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 border-t border-[var(--color-border)]">
+        <div className="container-luxury">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <LuxuryBadge>Why Choose Us</LuxuryBadge>
+            <h2 className="mt-4 text-4xl font-bold text-[var(--color-text-primary)]">
+              The ShopBot Difference
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: Download,
+                title: "Instant Access",
+                description: "Download your products immediately after purchase",
+              },
+              {
+                icon: Shield,
+                title: "Secure Payments",
+                description: "Your transactions are protected with encryption",
+              },
+              {
+                icon: Clock,
+                title: "24/7 Support",
+                description: "Our team is always here to help you",
+              },
+              {
+                icon: TrendingUp,
+                title: "Regular Updates",
+                description: "Get free updates for all your purchases",
+              },
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="p-8 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-3xl hover:border-[var(--color-accent-primary)]/30 transition-all group"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] flex items-center justify-center mb-6 group-hover:bg-[var(--color-accent-primary)] group-hover:text-[var(--color-bg-primary)] transition-all">
+                  <feature.icon className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-[var(--color-text-secondary)]">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

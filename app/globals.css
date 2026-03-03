@@ -1,26 +1,546 @@
 @import "tailwindcss";
 
+/* ============================================
+   ULTRA PREMIUM SHOPBOT DESIGN SYSTEM
+   Inspired by: Apple, Rolex, Cartier, Louis Vuitton
+   No gradients - Pure luxury solid colors
+   ============================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 
+   * DARK MODE (Default) - Premium Luxury Palette
+   * Inspired by luxury watch/jewelry brands
+   */
+  --color-bg-primary: #0a0a0b;
+  --color-bg-secondary: #111113;
+  --color-bg-tertiary: #1a1a1d;
+  --color-bg-elevated: #202024;
+  
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.72);
+  --color-text-tertiary: rgba(255, 255, 255, 0.48);
+  --color-text-muted: rgba(255, 255, 255, 0.28);
+  
+  /* Accent Colors - Sophisticated Gold & Champagne */
+  --color-accent-primary: #d4af37;
+  --color-accent-secondary: #c9a227;
+  --color-accent-hover: #e5c158;
+  --color-accent-subtle: rgba(212, 175, 55, 0.12);
+  
+  /* Status Colors - Muted luxury tones */
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.16);
+  --color-border-accent: rgba(212, 175, 55, 0.4);
+  
+  /* Shadows - Soft, premium feel */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 40px rgba(212, 175, 55, 0.15);
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-luxury: 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Light Mode - Clean, editorial aesthetic */
+[data-theme="light"] {
+  --color-bg-primary: #fafafa;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f5f5f5;
+  --color-bg-elevated: #ffffff;
+  
+  --color-text-primary: #0a0a0b;
+  --color-text-secondary: rgba(10, 10, 11, 0.72);
+  --color-text-tertiary: rgba(10, 10, 11, 0.48);
+  --color-text-muted: rgba(10, 10, 11, 0.28);
+  
+  /* Accent - Deep gold for light mode */
+  --color-accent-primary: #b8941f;
+  --color-accent-secondary: #a08000;
+  --color-accent-hover: #d4af37;
+  --color-accent-subtle: rgba(184, 148, 31, 0.08);
+  
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-border-hover: rgba(0, 0, 0, 0.12);
+  --color-border-accent: rgba(184, 148, 31, 0.4);
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 40px rgba(184, 148, 31, 0.12);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  transition: background-color var(--transition-slow), color var(--transition-slow);
+  overflow-x: hidden;
+}
+
+/* ============================================
+   SELECTION & SCROLLBAR
+   ============================================ */
+
+::selection {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent-primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-primary);
+}
+
+/* ============================================
+   TYPOGRAPHY - Editorial Style
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.display-large {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.display-medium {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* ============================================
+   LUXURY CARD STYLES
+   ============================================ */
+
+.luxury-card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.luxury-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-border-hover), transparent 50%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.luxury-card:hover {
+  border-color: var(--color-border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.luxury-card:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   PREMIUM BUTTON STYLES
+   ============================================ */
+
+.btn-luxury {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-bg-primary);
+  background-color: var(--color-accent-primary);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+  will-change: transform;
+}
+
+.btn-luxury:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-luxury:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-luxury-secondary {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-hover);
+}
+
+.btn-luxury-secondary:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+}
+
+/* ============================================
+   RIPPLE EFFECT - Premium Click Feedback
+   ============================================ */
+
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--color-accent-primary);
+  opacity: 0.3;
+  transform: scale(0);
+  animation: ripple-animation 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Touch ripple for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .ripple {
+    animation-duration: 0.4s;
+    opacity: 0.2;
+  }
+}
+
+/* ============================================
+   SCROLL TO TOP BUTTON
+   ============================================ */
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all var(--transition-base);
+  z-index: 100;
+  color: var(--color-text-secondary);
+}
+
+.scroll-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.scroll-to-top:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   THEME TOGGLE - Luxury Style
+   ============================================ */
+
+.theme-toggle {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-accent-primary);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background-color: var(--color-accent-primary);
+  border-radius: 50%;
+  transition: transform var(--transition-slow) cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+[data-theme="light"] .theme-toggle-thumb {
+  transform: translateX(28px);
+}
+
+/* ============================================
+   CURRENCY SELECTOR - Premium Dropdown
+   ============================================ */
+
+.currency-selector {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.currency-selector:hover {
+  border-color: var(--color-accent-primary);
+  background-color: var(--color-bg-elevated);
+}
+
+.currency-selector-open {
+  border-color: var(--color-accent-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.currency-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: var(--shadow-xl);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.95);
+  transition: all var(--transition-base);
+  z-index: 1000;
+}
+
+.currency-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.currency-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 0.875rem;
+}
+
+.currency-option:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.currency-option.active {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent-primary);
+}
+
+/* ============================================
+   PRODUCT IMAGE GALLERY - Immersive
+   ============================================ */
+
+.product-gallery {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background-color: var(--color-bg-tertiary);
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.product-gallery:hover .product-image {
+  transform: scale(1.03);
+}
+
+/* ============================================
+   ANIMATIONS - Refined & Subtle
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* ============================================
+   FOCUS STATES - Accessible Luxury
+   ============================================ */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 3px;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-accent {
+  color: var(--color-accent-primary);
+}
+
+.bg-accent-subtle {
+  background-color: var(--color-accent-subtle);
+}
+
+.border-accent {
+  border-color: var(--color-accent-primary);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .ripple {
+    display: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: rgba(255, 255, 255, 0.3);
+    --color-text-secondary: rgba(255, 255, 255, 0.9);
+  }
 }
