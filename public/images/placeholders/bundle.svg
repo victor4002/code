@@ -1,0 +1,39 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bundle-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0.15" />
+    </linearGradient>
+    <linearGradient id="bundle-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1" />
+      <stop offset="100%" style="stop-color:#a78bfa" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="400" height="300" fill="#1a1a25"/>
+  <rect width="400" height="300" fill="url(#bundle-grad)"/>
+  
+  <!-- Bundle/stack icon -->
+  <g transform="translate(160, 70)">
+    <!-- Back box -->
+    <rect x="20" y="0" width="60" height="70" rx="4" fill="none" stroke="#6366f1" stroke-width="2" opacity="0.4"/>
+    
+    <!-- Middle box -->
+    <rect x="10" y="15" width="60" height="70" rx="4" fill="none" stroke="#8b5cf6" stroke-width="2" opacity="0.6"/>
+    
+    <!-- Front box -->
+    <rect x="0" y="30" width="60" height="70" rx="4" fill="none" stroke="url(#bundle-accent)" stroke-width="2.5"/>
+    
+    <!-- Box content lines -->
+    <line x1="10" y1="50" x2="50" y2="50" stroke="#6366f1" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <line x1="10" y1="65" x2="40" y2="65" stroke="#6366f1" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+    <line x1="10" y1="80" x2="35" y2="80" stroke="#6366f1" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+    
+    <!-- Star badge -->
+    <circle cx="50" cy="25" r="12" fill="url(#bundle-accent)"/>
+    <path d="M50 19 L51.5 23.5 L56 23.5 L52.5 26.5 L53.5 31 L50 28.5 L46.5 31 L47.5 26.5 L44 23.5 L48.5 23.5 Z" fill="white"/>
+  </g>
+  
+  <text x="200" y="190" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#8b5cf6" opacity="0.8">Bundle</text>
+</svg>

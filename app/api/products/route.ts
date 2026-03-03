@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
       .from('products')
       .select(`
         *,
-        category:categories(*)
+        category:categories(*),
+        image_url
       `)
       .eq('status', 'published');
 

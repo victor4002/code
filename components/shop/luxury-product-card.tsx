@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag, Heart, Star, ArrowUpRight, Loader2 } from "lucide-react";
+import { ShoppingBag, Heart, Star, ArrowUpRight, Loader2, ImageOff } from "lucide-react";
 import { Product } from "@/types";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useCurrencyStore } from "@/lib/stores/currency-store";
@@ -16,6 +16,23 @@ interface LuxuryProductCardProps {
   index?: number;
 }
 
+// Get product image with fallback
+function getProductImage(product: Product): string {
+  // Use image_url if available
+  if (product.image_url && product.image_url.trim() !== '') {
+    return product.image_url;
+  }
+  
+  // Use first preview image if available
+  if (product.preview_images && product.preview_images.length > 0) {
+    return product.preview_images[0];
+  }
+  
+  // Return placeholder based on product type
+  const type = product.product_type || 'ebook';
+  return `/images/placeholders/${type}.svg`;
+}
+
 export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps) {
   const { addItem, isInCart } = useCartStore();
   const { formatPrice } = useCurrencyStore();
@@ -25,11 +42,15 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const inCart = isInCart(product.id);
   const discount = product.compare_at_price
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : null;
+
+  const productImage = getProductImage(product);
+  const displayImage = imageError ? "/images/placeholder.svg" : productImage;
 
   const handleAddToCart = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -89,49 +110,64 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
       }}
     >
       <Link href={`/products/${product.slug}`}>
-        <article className="group luxury-card cursor-pointer h-full flex flex-col">
-          {/* Image Container */}
+        <article className="group luxury-card cursor-pointer h-full flex flex-col bg-[var(--color-bg-card)]">
+          {/* Image Container - Enhanced */}
           <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-[var(--color-bg-tertiary)]">
             {/* Skeleton loader */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 skeleton" />
+            {!imageLoaded && !imageError && (
+              <div className="absolute inset-0 skeleton flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[var(--color-accent-primary)] animate-spin opacity-50" />
+              </div>
+            )}
+            
+            {/* Error state */}
+            {imageError && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]">
+                <ImageOff className="w-12 h-12 mb-2 opacity-50" />
+                <span className="text-sm">No image</span>
+              </div>
             )}
             
             <Image
-              src={product.image_url || "/images/placeholder.svg"}
+              src={displayImage}
               alt={product.name}
               fill
-              className={`object-cover transition-transform duration-700 group-hover:scale-105 ${
+              className={`object-cover transition-all duration-700 group-hover:scale-105 ${
                 imageLoaded ? 'opacity-100' : 'opacity-0'
               }`}
               onLoad={() => setImageLoaded(true)}
+              onError={() => {
+                setImageError(true);
+                setImageLoaded(true);
+              }}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              priority={index < 4}
             />
             
-            {/* Subtle gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Gradient overlay for better text contrast on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)] via-transparent to-transparent opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
             
-            {/* Discount badge - Enhanced visibility */}
+            {/* Discount badge */}
             {discount && (
-              <div className="absolute top-4 left-4 px-3 py-1.5 bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] text-xs font-bold rounded-lg shadow-md">
+              <div className="absolute top-3 left-3 px-2.5 py-1 bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)] text-white text-xs font-bold rounded-lg shadow-lg">
                 -{discount}%
               </div>
             )}
             
             {/* Category badge */}
-            <div className="absolute top-4 right-4 px-3 py-1.5 bg-[var(--color-bg-secondary)]/90 backdrop-blur-sm border border-[var(--color-border)] text-[var(--color-text-secondary)] text-xs font-medium rounded-lg">
-              {product.category?.name || "Digital"}
+            <div className="absolute top-3 right-3 px-2.5 py-1 bg-[var(--color-bg-secondary)]/90 backdrop-blur-sm border border-[var(--color-border)] text-[var(--color-text-secondary)] text-xs font-medium rounded-lg">
+              {product.category?.name || product.product_type || "Digital"}
             </div>
 
-            {/* Quick actions - Enhanced hover experience */}
-            <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out">
+            {/* Quick actions - Appear on hover */}
+            <div className="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out">
               {/* Like button */}
               <button
                 onClick={handleLike}
                 onTouchStart={handleTouchStart}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
                   isLiked 
-                    ? "bg-red-500 text-white border-red-500" 
+                    ? "bg-red-500 text-white" 
                     : "bg-[var(--color-bg-secondary)]/90 backdrop-blur-sm border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-red-500 hover:border-red-500"
                 }`}
                 aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
@@ -144,10 +180,10 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
                 onClick={handleAddToCart}
                 onTouchStart={handleTouchStart}
                 disabled={isAddingToCart}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg disabled:cursor-not-allowed ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg disabled:cursor-not-allowed ${
                   inCart
                     ? "bg-[var(--color-success)] text-white"
-                    : "bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] hover:bg-[var(--color-accent-hover)] hover:scale-105"
+                    : "bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)] text-white hover:scale-105"
                 }`}
                 aria-label={inCart ? "In cart" : "Add to cart"}
               >
@@ -160,15 +196,15 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
             </div>
           </div>
 
-          {/* Content - Improved spacing and hierarchy */}
-          <div className="p-5 flex flex-col flex-grow">
-            {/* Rating - Enhanced with better spacing */}
-            <div className="flex items-center gap-1.5 mb-3">
+          {/* Content */}
+          <div className="p-4 flex flex-col flex-grow">
+            {/* Rating */}
+            <div className="flex items-center gap-1.5 mb-2">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-3.5 h-3.5 ${
+                    className={`w-3 h-3 ${
                       i < Math.floor(product.rating || 5)
                         ? "text-[var(--color-accent-primary)] fill-[var(--color-accent-primary)]"
                         : "text-[var(--color-border)]"
@@ -177,24 +213,24 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
                 ))}
               </div>
               <span className="text-xs text-[var(--color-text-muted)]">
-                ({product.review_count || 0} reviews)
+                ({product.review_count || 0})
               </span>
             </div>
 
-            {/* Title - Enhanced typography */}
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-accent-primary)] transition-colors duration-300 line-clamp-1">
+            {/* Title */}
+            <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-1 group-hover:text-[var(--color-accent-primary)] transition-colors duration-300 line-clamp-1">
               {product.name}
             </h3>
 
             {/* Description */}
-            <p className="text-sm text-[var(--color-text-tertiary)] line-clamp-2 mb-4 flex-grow">
-              {product.short_description}
+            <p className="text-sm text-[var(--color-text-tertiary)] line-clamp-2 mb-3 flex-grow">
+              {product.short_description || product.description?.substring(0, 100) || "Premium digital product"}
             </p>
 
-            {/* Price & CTA - Better visual hierarchy */}
-            <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)] mt-auto">
+            {/* Price & CTA */}
+            <div className="flex items-center justify-between pt-3 border-t border-[var(--color-border)] mt-auto">
               <div className="flex items-baseline gap-2">
-                <span className="text-xl font-bold text-[var(--color-text-primary)]">
+                <span className="text-lg font-bold text-[var(--color-text-primary)]">
                   {formatPrice(product.price)}
                 </span>
                 {product.compare_at_price && (
@@ -204,7 +240,7 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
                 )}
               </div>
               
-              {/* View link - Enhanced hover state */}
+              {/* View link */}
               <div className="flex items-center gap-1 text-[var(--color-accent-primary)] text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                 View
                 <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -227,7 +263,7 @@ export function LuxuryProductCardSkeleton({ index = 0 }: { index?: number }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className="luxury-card overflow-hidden"
+      className="luxury-card overflow-hidden bg-[var(--color-bg-card)]"
     >
       {/* Image skeleton */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
@@ -235,7 +271,7 @@ export function LuxuryProductCardSkeleton({ index = 0 }: { index?: number }) {
       </div>
 
       {/* Content skeleton */}
-      <div className="p-5 space-y-3">
+      <div className="p-4 space-y-3">
         {/* Rating skeleton */}
         <div className="flex items-center gap-2">
           <div className="w-20 h-3 skeleton" />
@@ -252,7 +288,7 @@ export function LuxuryProductCardSkeleton({ index = 0 }: { index?: number }) {
         </div>
 
         {/* Price skeleton */}
-        <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
+        <div className="flex items-center justify-between pt-3 border-t border-[var(--color-border)]">
           <div className="w-20 h-6 skeleton" />
           <div className="w-16 h-4 skeleton" />
         </div>

@@ -16,20 +16,41 @@ import {
   Shield,
   Zap,
   ArrowLeft,
+  ImageOff,
+  Loader2,
 } from "lucide-react";
-import { allProducts } from "@/lib/products";
+import { useProduct } from "@/hooks/use-api";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useCurrencyStore } from "@/lib/stores/currency-store";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { useRipple, RippleButton } from "@/hooks/use-ripple";
-import { ProductCard } from "@/components/shop/product-card";
+import { LuxuryProductCard, LuxuryProductCardSkeleton } from "@/components/shop/luxury-product-card";
+import { useProducts } from "@/hooks/use-api";
+
+// Get product image with fallback
+function getProductImage(product: any): string {
+  if (!product) return "/images/placeholder.svg";
+  
+  if (product.image_url && product.image_url.trim() !== '') {
+    return product.image_url;
+  }
+  
+  if (product.preview_images && product.preview_images.length > 0) {
+    return product.preview_images[0];
+  }
+  
+  const type = product.product_type || 'ebook';
+  return `/images/placeholders/${type}.svg`;
+}
 
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const product = allProducts.find((p) => p.slug === slug);
-
+  
+  const { product, loading, error } = useProduct(slug);
+  const { products: allProducts } = useProducts({});
+  
   const { addItem } = useCartStore();
   const { formatPrice } = useCurrencyStore();
   const { addToast } = useUIStore();
@@ -37,23 +58,34 @@ export default function ProductPage() {
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
-  // Related products
+  // Related products - from API
   const relatedProducts = allProducts
-    .filter((p) => p.category === product?.category && p.id !== product?.id)
+    .filter((p) => p.category?.name === product?.category?.name && p.id !== product?.id)
     .slice(0, 4);
 
   useEffect(() => {
-    if (!product) {
+    if (error) {
       router.push("/");
     }
-  }, [product, router]);
+  }, [error, router]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[var(--color-accent-primary)] animate-spin" />
+      </main>
+    );
+  }
 
   if (!product) return null;
 
-  const images = product.preview_images?.length
-    ? product.preview_images
-    : [product.image_url || "/images/placeholder.svg"];
+  const mainImage = getProductImage(product);
+  const previewImages = product.preview_images?.length 
+    ? product.preview_images 
+    : [mainImage];
 
   const handleAddToCart = (e: React.MouseEvent<HTMLElement>) => {
     createRipple(e);
@@ -96,10 +128,10 @@ export default function ProductPage() {
             </Link>
             <ChevronRight className="w-4 h-4 text-[var(--color-text-muted)]" />
             <Link
-              href={`/?category=${encodeURIComponent(product.category?.name || "")}`}
+              href={`/products?category=${encodeURIComponent(product.category?.name || "")}`}
               className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
             >
-              {product.category?.name}
+              {product.category?.name || "Products"}
             </Link>
             <ChevronRight className="w-4 h-4 text-[var(--color-text-muted)]" />
             <span className="text-[var(--color-text-primary)] truncate max-w-[200px]">
@@ -119,21 +151,45 @@ export default function ProductPage() {
               animate={{ opacity: 1, y: 0 }}
               className="relative aspect-square rounded-3xl overflow-hidden bg-[var(--color-bg-secondary)] border border-[var(--color-border)]"
             >
+              {!imageLoaded && !imageError && (
+                <div className="absolute inset-0 skeleton flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 text-[var(--color-accent-primary)] animate-spin" />
+                </div>
+              )}
+              
+              {imageError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-[var(--color-text-muted)]">
+                  <ImageOff className="w-16 h-16 mb-4 opacity-50" />
+                  <span>No image available</span>
+                </div>
+              )}
+              
               <Image
-                src={images[selectedImage]}
+                src={previewImages[selectedImage] || mainImage}
                 alt={product.name}
                 fill
-                className="object-cover"
+                className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 priority
+                onLoad={() => setImageLoaded(true)}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoaded(true);
+                }}
               />
             </motion.div>
-            {images.length > 1 && (
-              <div className="flex gap-3">
-                {images.map((img, index) => (
+            
+            {/* Thumbnail Gallery */}
+            {previewImages.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {previewImages.map((img: string, index: number) => (
                   <button
                     key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                    onClick={() => {
+                      setSelectedImage(index);
+                      setImageLoaded(false);
+                      setImageError(false);
+                    }}
+                    className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
                       selectedImage === index
                         ? "border-[var(--color-accent-primary)]"
                         : "border-transparent hover:border-[var(--color-border)]"
@@ -158,18 +214,21 @@ export default function ProductPage() {
             transition={{ delay: 0.1 }}
             className="flex flex-col"
           >
-            {/* Badge */}
-            <div className="flex items-center gap-3 mb-4">
+            {/* Badges */}
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
               {product.tags?.includes("bestseller") && (
                 <span className="px-3 py-1 bg-[var(--color-success)]/10 text-[var(--color-success)] text-xs font-bold uppercase tracking-wider rounded-full">
                   Bestseller
                 </span>
               )}
               {product.compare_at_price && (
-                <span className="px-3 py-1 bg-[var(--color-error)]/10 text-[var(--color-error)] text-xs font-bold uppercase tracking-wider rounded-full">
+                <span className="px-3 py-1 bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)] text-white text-xs font-bold uppercase tracking-wider rounded-full">
                   Sale
                 </span>
               )}
+              <span className="px-3 py-1 bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] text-xs font-medium rounded-full capitalize">
+                {product.product_type || "Digital"}
+              </span>
             </div>
 
             {/* Title */}
@@ -192,13 +251,13 @@ export default function ProductPage() {
                 ))}
               </div>
               <span className="text-[var(--color-text-secondary)]">
-                {product.rating} ({product.review_count} reviews)
+                {product.rating || 5} ({product.review_count || 0} reviews)
               </span>
             </div>
 
             {/* Price */}
             <div className="flex items-baseline gap-4 mb-8">
-              <span className="text-4xl lg:text-5xl font-bold text-[var(--color-accent-primary)]">
+              <span className="text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)]">
                 {formatPrice(product.price)}
               </span>
               {product.compare_at_price && (
@@ -210,7 +269,7 @@ export default function ProductPage() {
 
             {/* Description */}
             <p className="text-[var(--color-text-secondary)] text-lg leading-relaxed mb-8">
-              {product.description}
+              {product.description || product.short_description || "Premium digital product crafted with excellence."}
             </p>
 
             {/* Features */}
@@ -236,7 +295,7 @@ export default function ProductPage() {
             <div className="flex gap-4 mt-auto">
               <RippleButton
                 onClick={handleAddToCart}
-                className="flex-1 py-4 bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] font-semibold rounded-2xl hover:bg-[var(--color-accent-hover)] transition-all flex items-center justify-center gap-3"
+                className="flex-1 py-4 bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)] text-white font-semibold rounded-2xl hover:opacity-90 transition-all flex items-center justify-center gap-3"
               >
                 <ShoppingCart className="w-5 h-5" />
                 Add to Cart
@@ -290,6 +349,31 @@ export default function ProductPage() {
                 <li>Lifetime access with free updates</li>
                 <li>24/7 customer support</li>
               </ul>
+              
+              {/* Additional product info */}
+              {product.file_format && (
+                <div className="mt-6 pt-6 border-t border-[var(--color-border)]">
+                  <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-3">
+                    Technical Specifications
+                  </h3>
+                  <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                    {product.file_format && (
+                      <div className="flex justify-between">
+                        <span className="text-[var(--color-text-muted)]">Format:</span>
+                        <span className="text-[var(--color-text-primary)] uppercase">{product.file_format}</span>
+                      </div>
+                    )}
+                    {product.file_size && (
+                      <div className="flex justify-between">
+                        <span className="text-[var(--color-text-muted)]">Size:</span>
+                        <span className="text-[var(--color-text-primary)]">
+                          {(product.file_size / 1024 / 1024).toFixed(2)} MB
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -304,7 +388,7 @@ export default function ProductPage() {
                 You May Also Like
               </h2>
               <Link
-                href={`/?category=${encodeURIComponent(product.category?.name || "")}`}
+                href={`/products?category=${encodeURIComponent(product.category?.name || "")}`}
                 className="text-[var(--color-accent-primary)] hover:text-[var(--color-accent-hover)] transition-colors flex items-center gap-2"
               >
                 View All
@@ -312,8 +396,8 @@ export default function ProductPage() {
               </Link>
             </div>
             <div className="grid-responsive">
-              {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
+              {relatedProducts.map((p, index) => (
+                <LuxuryProductCard key={p.id} product={p} index={index} />
               ))}
             </div>
           </div>
