@@ -3,17 +3,18 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingBag, Search, Home, User } from "lucide-react";
+import { Menu, X, ShoppingBag, Search, Home, User, Package, Grid3X3 } from "lucide-react";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useUIStore } from "@/lib/stores/ui-store";
+import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { CurrencySelector } from "@/components/ui/currency-selector";
 import { useRipple } from "@/hooks/use-ripple";
 
 const navLinks = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/products", label: "Products" },
-  { href: "/categories", label: "Categories" },
+  { href: "/products", label: "Products", icon: Package },
+  { href: "/categories", label: "Categories", icon: Grid3X3 },
 ];
 
 export function LuxuryHeader() {
@@ -33,7 +34,6 @@ export function LuxuryHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
@@ -44,7 +44,6 @@ export function LuxuryHeader() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -61,50 +60,45 @@ export function LuxuryHeader() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-[var(--color-bg-primary)]/85 backdrop-blur-xl border-b border-[var(--color-border)]"
+            ? "bg-[var(--color-bg-primary)]/90 backdrop-blur-xl border-b border-[var(--color-border)]"
             : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Main header row - Perfectly aligned with consistent spacing */}
           <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo - Enhanced */}
-            <Link 
-              href="/" 
-              className="flex items-center gap-2.5 group"
-              onClick={(e) => createRipple(e as any)}
-            >
-              <div className="w-9 h-9 lg:w-10 lg:h-10 bg-[var(--color-accent-primary)] rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
-                <span className="text-[var(--color-bg-primary)] font-bold text-lg lg:text-xl">S</span>
-              </div>
-              <span className="text-lg lg:text-xl font-semibold text-[var(--color-text-primary)] tracking-tight">
-                ShopBot
-              </span>
-            </Link>
+            
+            {/* Logo - Left section */}
+            <div className="flex-shrink-0">
+              <Logo size="md" />
+            </div>
 
-            {/* Desktop Navigation - Enhanced with better spacing */}
-            <nav className="hidden lg:flex items-center gap-1">
+            {/* Desktop Navigation - Center section with perfect spacing */}
+            <nav className="hidden lg:flex items-center justify-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={(e) => createRipple(e as any)}
-                  className="relative px-4 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors text-sm font-medium group"
+                  className="relative px-5 py-2.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors text-sm font-medium group"
                 >
                   {link.label}
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[var(--color-accent-primary)] group-hover:w-5 transition-all duration-300 rounded-full" />
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)] group-hover:w-5 transition-all duration-300 rounded-full" />
                 </Link>
               ))}
             </nav>
 
-            {/* Actions - Better organized */}
-            <div className="flex items-center gap-1.5 lg:gap-2">
+            {/* Actions - Right section with consistent gaps */}
+            <div className="flex items-center gap-1 sm:gap-2">
               {/* Currency Selector - Desktop only */}
               <div className="hidden lg:block">
                 <CurrencySelector />
               </div>
 
               {/* Theme Toggle */}
-              <ThemeToggle />
+              <div className="hidden sm:block">
+                <ThemeToggle />
+              </div>
 
               {/* Search - Desktop */}
               <button
@@ -112,7 +106,7 @@ export function LuxuryHeader() {
                   createRipple(e);
                   setSearchOpen(true);
                 }}
-                className="hidden sm:flex w-10 h-10 items-center justify-center rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] transition-all"
+                className="hidden md:flex w-10 h-10 items-center justify-center rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] transition-all"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
@@ -129,13 +123,13 @@ export function LuxuryHeader() {
               >
                 <ShoppingBag className="w-5 h-5" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-gradient-to-r from-[var(--color-accent-primary)] to-[var(--color-accent-secondary)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {itemCount > 99 ? "99+" : itemCount}
                   </span>
                 )}
               </button>
 
-              {/* Mobile Menu Toggle - Enhanced */}
+              {/* Mobile Menu Toggle */}
               <button
                 onClick={(e) => {
                   createRipple(e);
@@ -174,7 +168,7 @@ export function LuxuryHeader() {
         </div>
       </header>
 
-      {/* Mobile Menu - Enhanced full-screen experience */}
+      {/* Mobile Menu - Full screen overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
@@ -184,7 +178,7 @@ export function LuxuryHeader() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-[var(--color-bg-primary)]/80 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-[var(--color-bg-primary)]/90 backdrop-blur-lg z-40 lg:hidden"
               onClick={() => setIsMobileMenuOpen(false)}
             />
             
@@ -194,10 +188,10 @@ export function LuxuryHeader() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 w-full max-w-sm z-50 lg:hidden bg-[var(--color-bg-primary)] border-l border-[var(--color-border)]"
+              className="fixed inset-y-0 right-0 w-full max-w-sm z-50 lg:hidden bg-[var(--color-bg-secondary)] border-l border-[var(--color-border)]"
             >
               {/* Menu Header */}
-              <div className="flex items-center justify-between h-16 px-4 border-b border-[var(--color-border)]">
+              <div className="flex items-center justify-between h-16 px-6 border-b border-[var(--color-border)]">
                 <span className="text-lg font-semibold text-[var(--color-text-primary)]">Menu</span>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -222,7 +216,7 @@ export function LuxuryHeader() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] transition-all text-base font-medium"
                     >
-                      {link.icon && <link.icon className="w-5 h-5" />}
+                      <link.icon className="w-5 h-5" />
                       {link.label}
                     </Link>
                   </motion.div>

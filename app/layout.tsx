@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { LuxuryHeader } from "@/components/shop/luxury-header";
 import { LuxuryFooter } from "@/components/shop/luxury-footer";
+import { MobileBottomNav } from "@/components/shop/mobile-bottom-nav";
 import { CartDrawer } from "@/components/shop/cart-drawer";
 import { SearchModal } from "@/components/shop/search-modal";
 import { ScrollToTopButton } from "@/components/ui/scroll-to-top-button";
@@ -46,14 +47,19 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
     { media: "(prefers-color-scheme: light)", color: "#fafafa" },
   ],
 };
@@ -65,12 +71,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="antialiased min-h-screen flex flex-col">
+      <body className="antialiased min-h-screen flex flex-col bg-[var(--color-bg-primary)]">
         <LuxuryHeader />
         <main className="flex-grow">
           {children}
         </main>
         <LuxuryFooter />
+        <MobileBottomNav />
         <CartDrawer />
         <SearchModal />
         <ScrollToTopButton />
