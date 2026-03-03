@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /* ============================================
-   ULTRA PREMIUM SHOPBOT DESIGN SYSTEM
-   Inspired by: Apple, Rolex, Cartier, Louis Vuitton
-   No gradients - Pure luxury solid colors
+   ULTRA PREMIUM SHOPBOT DESIGN SYSTEM v2.0
+   Inspired by: Apple, Rolex, Cartier, Aesop
+   Research-backed luxury e-commerce UX
    ============================================ */
 
 :root {
@@ -16,11 +16,11 @@
   --color-bg-tertiary: #1a1a1d;
   --color-bg-elevated: #202024;
   
-  /* Text Colors */
+  /* Text Colors - Enhanced contrast for readability */
   --color-text-primary: #ffffff;
-  --color-text-secondary: rgba(255, 255, 255, 0.72);
-  --color-text-tertiary: rgba(255, 255, 255, 0.48);
-  --color-text-muted: rgba(255, 255, 255, 0.28);
+  --color-text-secondary: rgba(255, 255, 255, 0.75);
+  --color-text-tertiary: rgba(255, 255, 255, 0.50);
+  --color-text-muted: rgba(255, 255, 255, 0.30);
   
   /* Accent Colors - Sophisticated Gold & Champagne */
   --color-accent-primary: #d4af37;
@@ -33,9 +33,9 @@
   --color-error: #ef4444;
   --color-warning: #f59e0b;
   
-  /* Borders */
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.16);
+  /* Borders - Subtle definition */
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
   --color-border-accent: rgba(212, 175, 55, 0.4);
   
   /* Shadows - Soft, premium feel */
@@ -45,11 +45,38 @@
   --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
   --shadow-glow: 0 0 40px rgba(212, 175, 55, 0.15);
   
-  /* Transitions */
+  /* Transitions - Refined timing */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-luxury: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Typography Scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  
+  /* Spacing Scale - Generous white space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
 }
 
 /* Light Mode - Clean, editorial aesthetic */
@@ -60,9 +87,9 @@
   --color-bg-elevated: #ffffff;
   
   --color-text-primary: #0a0a0b;
-  --color-text-secondary: rgba(10, 10, 11, 0.72);
-  --color-text-tertiary: rgba(10, 10, 11, 0.48);
-  --color-text-muted: rgba(10, 10, 11, 0.28);
+  --color-text-secondary: rgba(10, 10, 11, 0.75);
+  --color-text-tertiary: rgba(10, 10, 11, 0.50);
+  --color-text-muted: rgba(10, 10, 11, 0.30);
   
   /* Accent - Deep gold for light mode */
   --color-accent-primary: #b8941f;
@@ -70,19 +97,19 @@
   --color-accent-hover: #d4af37;
   --color-accent-subtle: rgba(184, 148, 31, 0.08);
   
-  --color-border: rgba(0, 0, 0, 0.06);
-  --color-border-hover: rgba(0, 0, 0, 0.12);
+  --color-border: rgba(0, 0, 0, 0.05);
+  --color-border-hover: rgba(0, 0, 0, 0.10);
   --color-border-accent: rgba(184, 148, 31, 0.4);
   
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
-  --shadow-glow: 0 0 40px rgba(184, 148, 31, 0.12);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.10);
+  --shadow-glow: 0 0 40px rgba(184, 148, 31, 0.10);
 }
 
 /* ============================================
-   BASE STYLES
+   BASE STYLES - Enhanced typography
    ============================================ */
 
 * {
@@ -95,13 +122,17 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   background-color: var(--color-bg-primary);
   color: var(--color-text-secondary);
+  /* Optimal line height for readability: 1.5-1.6 */
   line-height: 1.6;
+  /* Improved font features for luxury feel */
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   transition: background-color var(--transition-slow), color var(--transition-slow);
   overflow-x: hidden;
 }
@@ -134,36 +165,61 @@ body {
 }
 
 /* ============================================
-   TYPOGRAPHY - Editorial Style
+   TYPOGRAPHY - Editorial Style with hierarchy
    ============================================ */
 
+/* Heading hierarchy with optimal spacing */
 h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-primary);
   font-weight: 600;
+  /* Slightly tighter tracking for headlines */
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  /* Optimal line height for headings */
+  line-height: 1.15;
+  /* Generous margin for visual separation */
+  margin-bottom: var(--space-4);
 }
 
+/* Large display text for hero sections */
 .display-large {
-  font-size: clamp(3rem, 8vw, 6rem);
+  font-size: clamp(2.5rem, 6vw, 5rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.1;
+  line-height: 1.05;
+  /* Ensure optimal line length: 6-7 words max per line */
+  max-width: 15ch;
 }
 
 .display-medium {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.15;
+  max-width: 25ch;
+}
+
+/* Body text optimization */
+.text-body {
+  font-size: var(--text-base);
+  line-height: 1.6;
+  /* Optimal line length: 45-75 characters */
+  max-width: 65ch;
 }
 
 .text-balance {
   text-wrap: balance;
 }
 
+/* Luxury uppercase text with letter spacing */
+.text-luxury-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
 /* ============================================
-   LUXURY CARD STYLES
+   LUXURY CARD STYLES - Enhanced hover states
    ============================================ */
 
 .luxury-card {
@@ -193,7 +249,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .luxury-card:hover {
   border-color: var(--color-border-hover);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -202,7 +258,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   PREMIUM BUTTON STYLES
+   PREMIUM BUTTON STYLES - Enhanced feedback
    ============================================ */
 
 .btn-luxury {
@@ -211,7 +267,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-bg-primary);
   background-color: var(--color-accent-primary);
@@ -222,11 +278,13 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   transition: all var(--transition-base);
   will-change: transform;
+  /* Minimum touch target size: 44px */
+  min-height: 44px;
 }
 
 .btn-luxury:hover {
   background-color: var(--color-accent-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-glow);
 }
 
@@ -282,7 +340,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   SCROLL TO TOP BUTTON
+   SCROLL TO TOP BUTTON - Enhanced visibility
    ============================================ */
 
 .scroll-to-top {
@@ -304,6 +362,8 @@ h1, h2, h3, h4, h5, h6 {
   transition: all var(--transition-base);
   z-index: 100;
   color: var(--color-text-secondary);
+  /* Enhanced shadow for better visibility */
+  box-shadow: var(--shadow-md);
 }
 
 .scroll-to-top.visible {
@@ -315,8 +375,8 @@ h1, h2, h3, h4, h5, h6 {
 .scroll-to-top:hover {
   border-color: var(--color-accent-primary);
   color: var(--color-accent-primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
 }
 
 /* ============================================
@@ -373,7 +433,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 10px;
   cursor: pointer;
   transition: all var(--transition-base);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-text-secondary);
 }
@@ -419,7 +479,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 8px;
   cursor: pointer;
   transition: all var(--transition-fast);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .currency-option:hover {
@@ -450,7 +510,28 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .product-gallery:hover .product-image {
-  transform: scale(1.03);
+  transform: scale(1.05);
+}
+
+/* ============================================
+   SKELETON LOADING - Premium placeholder
+   ============================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-tertiary) 25%,
+    var(--color-bg-elevated) 50%,
+    var(--color-bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ============================================
@@ -522,6 +603,68 @@ a:focus-visible {
   border-color: var(--color-accent-primary);
 }
 
+/* Container with generous padding */
+.container-luxury {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .container-luxury {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-luxury {
+    padding-left: var(--space-12);
+    padding-right: var(--space-12);
+  }
+}
+
+/* Section spacing - Generous white space */
+.section-luxury {
+  padding-top: var(--space-24);
+  padding-bottom: var(--space-24);
+}
+
+@media (min-width: 768px) {
+  .section-luxury {
+    padding-top: var(--space-32);
+    padding-bottom: var(--space-32);
+  }
+}
+
+/* Grid responsive */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid-responsive {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -535,6 +678,11 @@ a:focus-visible {
   .ripple {
     display: none;
   }
+  
+  .skeleton {
+    animation: none;
+    background: var(--color-bg-tertiary);
+  }
 }
 
 /* High contrast mode support */
@@ -542,5 +690,10 @@ a:focus-visible {
   :root {
     --color-border: rgba(255, 255, 255, 0.3);
     --color-text-secondary: rgba(255, 255, 255, 0.9);
+  }
+  
+  [data-theme="light"] {
+    --color-border: rgba(0, 0, 0, 0.3);
+    --color-text-secondary: rgba(0, 0, 0, 0.9);
   }
 }

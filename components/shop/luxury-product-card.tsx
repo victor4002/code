@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag, Heart, Star, ArrowUpRight } from "lucide-react";
+import { ShoppingBag, Heart, Star, ArrowUpRight, Loader2 } from "lucide-react";
 import { Product } from "@/types";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useCurrencyStore } from "@/lib/stores/currency-store";
@@ -21,13 +22,16 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
   const { addToast } = useUIStore();
   const { createRipple } = useRipple();
   const { handleTouchStart } = useTouchRipple();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const inCart = isInCart(product.id);
   const discount = product.compare_at_price
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : null;
 
-  const handleAddToCart = (e: React.MouseEvent<HTMLElement>) => {
+  const handleAddToCart = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
     createRipple(e);
@@ -41,7 +45,14 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
       return;
     }
 
+    setIsAddingToCart(true);
+    
+    // Simulate network delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
     addItem(product);
+    setIsAddingToCart(false);
+    
     addToast({
       type: "success",
       title: "Added to cart",
@@ -53,100 +64,135 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
     });
   };
 
+  const handleLike = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    createRipple(e);
+    setIsLiked(!isLiked);
+    
+    addToast({
+      type: isLiked ? "info" : "success",
+      title: isLiked ? "Removed from favorites" : "Added to favorites",
+      description: `${product.name} has been ${isLiked ? "removed from" : "added to"} your favorites.`,
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ 
-        delay: index * 0.1, 
+        delay: index * 0.08, 
         duration: 0.6, 
         ease: [0.16, 1, 0.3, 1] 
       }}
     >
       <Link href={`/products/${product.slug}`}>
-        <div className="group luxury-card cursor-pointer">
+        <article className="group luxury-card cursor-pointer h-full flex flex-col">
           {/* Image Container */}
-          <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-[var(--color-bg-tertiary)]">
+            {/* Skeleton loader */}
+            {!imageLoaded && (
+              <div className="absolute inset-0 skeleton" />
+            )}
+            
             <Image
               src={product.image_url || "/images/placeholder.svg"}
               alt={product.name}
               fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              className={`object-cover transition-transform duration-700 group-hover:scale-105 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              onLoad={() => setImageLoaded(true)}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             />
             
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)] via-transparent to-transparent opacity-40" />
+            {/* Subtle gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-primary)]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            {/* Discount badge */}
+            {/* Discount badge - Enhanced visibility */}
             {discount && (
-              <div className="absolute top-4 left-4 px-3 py-1.5 bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] text-xs font-bold rounded-lg">
+              <div className="absolute top-4 left-4 px-3 py-1.5 bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] text-xs font-bold rounded-lg shadow-md">
                 -{discount}%
               </div>
             )}
             
             {/* Category badge */}
-            <div className="absolute top-4 right-4 px-3 py-1.5 bg-[var(--color-bg-secondary)]/80 backdrop-blur-sm border border-[var(--color-border)] text-[var(--color-text-secondary)] text-xs font-medium rounded-lg">
+            <div className="absolute top-4 right-4 px-3 py-1.5 bg-[var(--color-bg-secondary)]/90 backdrop-blur-sm border border-[var(--color-border)] text-[var(--color-text-secondary)] text-xs font-medium rounded-lg">
               {product.category?.name || "Digital"}
             </div>
 
-            {/* Quick actions - appear on hover */}
-            <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+            {/* Quick actions - Enhanced hover experience */}
+            <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out">
+              {/* Like button */}
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
+                onClick={handleLike}
                 onTouchStart={handleTouchStart}
-                className="w-10 h-10 bg-[var(--color-bg-secondary)]/90 backdrop-blur-sm border border-[var(--color-border)] rounded-full flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-accent-primary)] hover:border-[var(--color-accent-primary)] transition-all"
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg ${
+                  isLiked 
+                    ? "bg-red-500 text-white border-red-500" 
+                    : "bg-[var(--color-bg-secondary)]/90 backdrop-blur-sm border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-red-500 hover:border-red-500"
+                }`}
+                aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
               >
-                <Heart className="w-4 h-4" />
+                <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
               </button>
+              
+              {/* Add to cart button */}
               <button
                 onClick={handleAddToCart}
                 onTouchStart={handleTouchStart}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                disabled={isAddingToCart}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg disabled:cursor-not-allowed ${
                   inCart
                     ? "bg-[var(--color-success)] text-white"
-                    : "bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] hover:bg-[var(--color-accent-hover)]"
+                    : "bg-[var(--color-accent-primary)] text-[var(--color-bg-primary)] hover:bg-[var(--color-accent-hover)] hover:scale-105"
                 }`}
+                aria-label={inCart ? "In cart" : "Add to cart"}
               >
-                <ShoppingBag className="w-4 h-4" />
+                {isAddingToCart ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ShoppingBag className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="p-5">
-            {/* Rating */}
-            <div className="flex items-center gap-1 mb-3">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-3.5 h-3.5 ${
-                    i < Math.floor(product.rating || 5)
-                      ? "text-[var(--color-accent-primary)] fill-[var(--color-accent-primary)]"
-                      : "text-[var(--color-border)]"
-                  }`}
-                />
-              ))}
-              <span className="text-xs text-[var(--color-text-muted)] ml-1">
-                ({product.review_count || 0})
+          {/* Content - Improved spacing and hierarchy */}
+          <div className="p-5 flex flex-col flex-grow">
+            {/* Rating - Enhanced with better spacing */}
+            <div className="flex items-center gap-1.5 mb-3">
+              <div className="flex items-center gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-3.5 h-3.5 ${
+                      i < Math.floor(product.rating || 5)
+                        ? "text-[var(--color-accent-primary)] fill-[var(--color-accent-primary)]"
+                        : "text-[var(--color-border)]"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-[var(--color-text-muted)]">
+                ({product.review_count || 0} reviews)
               </span>
             </div>
 
-            {/* Title */}
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-accent-primary)] transition-colors line-clamp-1">
+            {/* Title - Enhanced typography */}
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-accent-primary)] transition-colors duration-300 line-clamp-1">
               {product.name}
             </h3>
 
             {/* Description */}
-            <p className="text-sm text-[var(--color-text-tertiary)] line-clamp-2 mb-4">
+            <p className="text-sm text-[var(--color-text-tertiary)] line-clamp-2 mb-4 flex-grow">
               {product.short_description}
             </p>
 
-            {/* Price & CTA */}
-            <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
+            {/* Price & CTA - Better visual hierarchy */}
+            <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)] mt-auto">
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-bold text-[var(--color-text-primary)]">
                   {formatPrice(product.price)}
@@ -158,14 +204,59 @@ export function LuxuryProductCard({ product, index = 0 }: LuxuryProductCardProps
                 )}
               </div>
               
-              <div className="flex items-center gap-1 text-[var(--color-accent-primary)] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* View link - Enhanced hover state */}
+              <div className="flex items-center gap-1 text-[var(--color-accent-primary)] text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                 View
-                <ArrowUpRight className="w-4 h-4" />
+                <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </div>
             </div>
           </div>
-        </div>
+        </article>
       </Link>
+    </motion.div>
+  );
+}
+
+/* ============================================
+   SKELETON PRODUCT CARD - Loading state
+   ============================================ */
+
+export function LuxuryProductCardSkeleton({ index = 0 }: { index?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.4 }}
+      className="luxury-card overflow-hidden"
+    >
+      {/* Image skeleton */}
+      <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
+        <div className="absolute inset-0 skeleton" />
+      </div>
+
+      {/* Content skeleton */}
+      <div className="p-5 space-y-3">
+        {/* Rating skeleton */}
+        <div className="flex items-center gap-2">
+          <div className="w-20 h-3 skeleton" />
+          <div className="w-16 h-3 skeleton" />
+        </div>
+
+        {/* Title skeleton */}
+        <div className="w-3/4 h-5 skeleton" />
+
+        {/* Description skeleton */}
+        <div className="space-y-2">
+          <div className="w-full h-3 skeleton" />
+          <div className="w-2/3 h-3 skeleton" />
+        </div>
+
+        {/* Price skeleton */}
+        <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
+          <div className="w-20 h-6 skeleton" />
+          <div className="w-16 h-4 skeleton" />
+        </div>
+      </div>
     </motion.div>
   );
 }

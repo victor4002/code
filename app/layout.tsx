@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { LuxuryHeader } from "@/components/shop/luxury-header";
@@ -12,6 +12,7 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -25,12 +26,36 @@ export const metadata: Metadata = {
     "premium",
     "marketplace",
     "downloads",
+    "design resources",
   ],
+  authors: [{ name: "ShopBot" }],
+  creator: "ShopBot",
   openGraph: {
     title: "ShopBot | Premium Digital Products",
     description: "Discover meticulously curated digital products for creators who demand excellence.",
     type: "website",
+    locale: "en_US",
+    siteName: "ShopBot",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "ShopBot | Premium Digital Products",
+    description: "Discover meticulously curated digital products for creators who demand excellence.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+  ],
 };
 
 export default function RootLayout({
@@ -40,14 +65,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="antialiased">
+      <body className="antialiased min-h-screen flex flex-col">
         <LuxuryHeader />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <LuxuryFooter />
         <CartDrawer />
         <SearchModal />
         <ScrollToTopButton />
         <ToastContainer />
-        {children}
-        <LuxuryFooter />
       </body>
     </html>
   );
